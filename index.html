@@ -1,0 +1,1111 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="he">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>אפליקציית ניתוח התנהגות - מקצועית</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            direction: rtl;
+        }
+        
+        #root {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .app-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 18px;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .nav-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+        
+        .nav-button {
+            background: white;
+            border: 3px solid #667eea;
+            color: #667eea;
+            padding: 12px 25px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .nav-button:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .nav-button.active {
+            background: #667eea;
+            color: white;
+        }
+        
+        .section {
+            animation: fadeIn 0.5s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .abc-visual {
+            display: flex;
+            justify-content: space-around;
+            margin: 40px 0;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .abc-card {
+            flex: 1;
+            min-width: 250px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+        
+        .abc-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .abc-card .icon {
+            font-size: 60px;
+            margin-bottom: 15px;
+        }
+        
+        .abc-card h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 22px;
+        }
+        
+        .abc-card p {
+            color: #555;
+            line-height: 1.6;
+            margin: 5px 0;
+        }
+        
+        .expandable {
+            background: white;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+        
+        .expandable-header {
+            background: #f8f9fa;
+            padding: 15px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.3s;
+        }
+        
+        .expandable-header:hover {
+            background: #e9ecef;
+        }
+        
+        .expandable-header h4 {
+            color: #2c3e50;
+            font-size: 18px;
+        }
+        
+        .expandable-icon {
+            font-size: 20px;
+            transition: transform 0.3s;
+        }
+        
+        .expandable-icon.open {
+            transform: rotate(180deg);
+        }
+        
+        .expandable-content {
+            padding: 20px;
+            display: none;
+        }
+        
+        .expandable-content.show {
+            display: block;
+        }
+        
+        .expandable-content ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .expandable-content li {
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .expandable-content li:before {
+            content: "✓";
+            color: #667eea;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        
+        .scenario-card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 20px 0;
+            border-right: 5px solid #667eea;
+        }
+        
+        .scenario-card h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 22px;
+        }
+        
+        .scenario-text {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            line-height: 1.8;
+            font-size: 16px;
+        }
+        
+        .question-box {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .question-box h4 {
+            color: #856404;
+            margin-bottom: 15px;
+        }
+        
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .option {
+            background: white;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 16px;
+        }
+        
+        .option:hover {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+        
+        .option.selected {
+            border-color: #667eea;
+            background: #667eea;
+            color: white;
+        }
+        
+        .option.correct {
+            border-color: #28a745;
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .option.wrong {
+            border-color: #dc3545;
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .feedback {
+            background: #d1ecf1;
+            border: 2px solid #17a2b8;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .feedback.correct {
+            background: #d4edda;
+            border-color: #28a745;
+        }
+        
+        .feedback.wrong {
+            background: #f8d7da;
+            border-color: #dc3545;
+        }
+        
+        .button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+            transition: all 0.3s;
+            margin: 10px 5px;
+        }
+        
+        .button:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .progress-bar {
+            background: #e9ecef;
+            border-radius: 10px;
+            height: 30px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+        
+        .progress-fill {
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            height: 100%;
+            transition: width 0.5s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .score-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .score-card h2 {
+            font-size: 48px;
+            margin: 20px 0;
+        }
+        
+        .certificate {
+            background: white;
+            border: 10px solid #ffd700;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            margin: 20px 0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .certificate h2 {
+            color: #667eea;
+            font-size: 36px;
+            margin-bottom: 20px;
+        }
+        
+        .certificate .seal {
+            font-size: 80px;
+            margin: 20px 0;
+        }
+        
+        .info-box {
+            background: #e7f3ff;
+            border-right: 5px solid #2196F3;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .info-box h4 {
+            color: #1976D2;
+            margin-bottom: 10px;
+            font-size: 20px;
+        }
+
+        .info-box p {
+            line-height: 1.8;
+            margin: 10px 0;
+        }
+        
+        .tip-box {
+            background: #d5f4e6;
+            border-right: 5px solid #27ae60;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .tip-box h4 {
+            color: #27ae60;
+            margin-bottom: 10px;
+        }
+        
+        .example-box {
+            background: #fff3cd;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        
+        .example-box strong {
+            color: #856404;
+        }
+        
+        .function-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+            border-right: 5px solid;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+        
+        .function-card:hover {
+            transform: translateY(-3px);
+        }
+        
+        .function-attention { border-right-color: #e74c3c; }
+        .function-escape { border-right-color: #f39c12; }
+        .function-access { border-right-color: #9b59b6; }
+        .function-sensory { border-right-color: #1abc9c; }
+
+        .numbered-list {
+            list-style: none;
+            counter-reset: item;
+            padding: 0;
+        }
+
+        .numbered-list li {
+            counter-increment: item;
+            padding: 12px 0;
+            line-height: 1.8;
+        }
+
+        .numbered-list li:before {
+            content: counter(item) ". ";
+            color: #667eea;
+            font-weight: bold;
+            font-size: 20px;
+            margin-left: 10px;
+        }
+
+        .key-question {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            margin: 30px 0;
+            font-size: 20px;
+            font-weight: bold;
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        @media print {
+            body {
+                background: white;
+            }
+            .nav-buttons, .button {
+                display: none;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .abc-visual {
+                flex-direction: column;
+            }
+            
+            .nav-buttons {
+                flex-direction: column;
+            }
+            
+            .header h1 {
+                font-size: 24px;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState } = React;
+
+        function Expandable({ title, children }) {
+            const [isOpen, setIsOpen] = useState(false);
+            
+            return (
+                <div className="expandable">
+                    <div className="expandable-header" onClick={() => setIsOpen(!isOpen)}>
+                        <h4>{title}</h4>
+                        <span className={`expandable-icon ${isOpen ? 'open' : ''}`}>▼</span>
+                    </div>
+                    <div className={`expandable-content ${isOpen ? 'show' : ''}`}>
+                        {children}
+                    </div>
+                </div>
+            );
+        }
+
+        const scenarios = [
+            {
+                id: 1,
+                title: "תרחיש 1: נועה והמתמטיקה",
+                story: `נועה, בת 8, תלמידה בכיתה ג'. בכל פעם שמתחיל שיעור מתמטיקה, המורה מבחינה שנועה מתחילה לדבר עם החברה שלידה, לשחק עם העפרונות, ולעיתים אפילו אומרת "כואב לי הבטן". 
+                
+לפני שבועיים, כאשר המורה ניגשה לעזור לנועה במשימת חשבון קשה, נועה התחילה לבכות ואמרה "אני לא יודעת, זה קשה מדי!". המורה, שרצתה להרגיע אותה, אמרה "בסדר מותק, תעשי רק את חצי מהתרגילים".
+                
+מאז, בכל שיעור מתמטיקה, נועה מתלוננת שהמשימה קשה מדי ומתחילה לבכות. המורה כבר לא יודעת מה לעשות.`,
+                questions: [
+                    {
+                        question: 'מהם האירועים המקדימים (A) להתנהגות של נועה?',
+                        options: [
+                            'התחלת שיעור מתמטיקה + קבלת משימת חשבון קשה (דרישה אקדמית + משימה קשה מדי)',
+                            'המורה עוברת ליד נועה',
+                            'נועה רעבה',
+                            'החברה שלה לא בכיתה'
+                        ],
+                        correct: 0,
+                        explanation: 'נכון! הטריגר הוא דרישה אקדמית (מתן משימה) + קושי המשימה. זה בדיוק מה שמתרחש ממש לפני ההתנהגות הבעייתית. זהו "טריגר 4" - מצב דרישה להתנהגות.'
+                    },
+                    {
+                        question: 'מהי ההתנהגות (B) המדויקת של נועה?',
+                        options: [
+                            'נועה לא אוהבת מתמטיקה',
+                            'נועה מדברת עם חברה, משחקת בעפרונות, מתלוננת על כאב בטן, בוכה ואומרת "זה קשה מדי"',
+                            'נועה עצובה',
+                            'נועה לא מרוכזת'
+                        ],
+                        correct: 1,
+                        explanation: 'מצוין! תיאור התנהגות צריך להיות ספציפי, מדיד ואובייקטיבי - לא "לא אוהבת" או "עצובה" אלא התנהגויות קונקרטיות שאפשר לראות, לספור ולמדוד.'
+                    },
+                    {
+                        question: 'מהן התוצאות (C) שמחזקות את ההתנהגות?',
+                        options: [
+                            'המורה כועסת על נועה',
+                            'נועה מקבלת הקלה - צריכה לעשות רק חצי מהתרגילים (בריחה ממצב לחץ)',
+                            'נועה מקבלת ציון נמוך',
+                            'החברים צוחקים עליה'
+                        ],
+                        correct: 1,
+                        explanation: 'נכון מאוד! התוצאה המשמרת היא חיזוק שלילי - נועה "בורחת" מהמשימה הקשה על ידי קבלת הקלה. המורה מפחיתה את הדרישה, וזה מחזק את הבכי וההתלוננות.'
+                    },
+                    {
+                        question: 'מהי הפונקציה של ההתנהגות?',
+                        options: [
+                            'השגת תשומת לב',
+                            'בריחה/הימנעות ממשימה קשה (חיזוק שלילי)',
+                            'השגת דבר רצוי (משחק)',
+                            'ויסות עצמי/גירוי חושי'
+                        ],
+                        correct: 1,
+                        explanation: 'מעולה! הפונקציה היא בריחה/הימנעות (חיזוק שלילי). נועה למדה שאם היא בוכה ומתלוננת, היא מקבלת הקלה במשימה - כלומר, היא "בורחת" מהקושי והמאמץ הנדרש.'
+                    }
+                ]
+            },
+            {
+                id: 2,
+                title: "תרחיש 2: עומר המפריע",
+                story: `עומר, בן 6, גן חובה. בכל בוקר כשהילדים יושבים במעגל לסיפור, עומר מתחיל להפריע. הוא עושה קולות מצחיקים, קופץ, ומנסה לגעת בילדים שיושבים לידו.
+                
+הגננת כבר ניסתה להתעלם, אבל הילדים צוחקים והיא נאלצת לעצור את הסיפור ולהגיד "עומר, די! תשב יפה!". 
+                
+לפעמים היא מוציאה אותו מהמעגל לכמה דקות. בזמן האחרון, עומר מפריע יותר ויותר - כמעט בכל יום. הגננת מבחינה שברגע שהיא אומרת את שמו, עומר מחייך.`,
+                questions: [
+                    {
+                        question: 'מהם האירועים המקדימים (A)?',
+                        options: [
+                            'עומר לא ישן טוב בלילה',
+                            'ישיבה במעגל + זמן סיפור (פעילות פסיבית וארוכה + זמן לא מובנה)',
+                            'הגננת כועסת',
+                            'יום שישי'
+                        ],
+                        correct: 1,
+                        explanation: 'נכון! הטריגר הוא "טריגר 1" - הפסקת תשומת לב. הגננת מספרת סיפור לכולם, עומר לא מקבל תשומת לב אישית. בנוסף, זו פעילות פסיבית וארוכה - נסיבה שמעלה את הסבירות להתנהגות.'
+                    },
+                    {
+                        question: 'מהי ההתנהגות (B)?',
+                        options: [
+                            'עומר לא מתנהג יפה',
+                            'עומר רע',
+                            'עומר עושה קולות מצחיקים, קופץ, נוגע בילדים אחרים',
+                            'עומר מפריע'
+                        ],
+                        correct: 2,
+                        explanation: 'כל הכבוד! "מפריע" או "לא מתנהג יפה" זה לא מספיק ספציפי. צריך לתאר בדיוק מה הוא עושה - קולות, קפיצות, נגיעות. רק ככה אפשר למדוד ולעקוב אחרי השינוי.'
+                    },
+                    {
+                        question: 'מהן התוצאות (C)?',
+                        options: [
+                            'הילדים צוחקים, הגננת אומרת את שמו ומדברת איתו, לפעמים מוציאה אותו מהמעגל',
+                            'עומר מקבל מדבקה',
+                            'עומר הולך הביתה',
+                            'הגננת מתעלמת לגמרי'
+                        ],
+                        correct: 0,
+                        explanation: 'נכון! עומר מקבל המון תשומת לב - גם מהילדים (צחוק - תשומת לב עמיתים) וגם מהגננת (קריאה בשמו, דיבור, הוצאה מהמעגל). כל אלה הן צורות של תשומת לב שמחזקות את ההתנהגות!'
+                    },
+                    {
+                        question: 'מהי הפונקציה?',
+                        options: [
+                            'השגת תשומת לב מהגננת והילדים (חיזוק חיובי חברתי)',
+                            'בריחה/הימנעות',
+                            'השגת צעצוע',
+                            'ויסות עצמי/גירוי חושי'
+                        ],
+                        correct: 0,
+                        explanation: 'מצוין! הפונקציה היא השגת תשומת לב (חיזוק חיובי). עומר למד שכשהוא מפריע - כולם מסתכלים עליו, הילדים צוחקים, והגננת מדברת איתו. זה בדיוק מה שהוא רוצה! החיוך שלו מעיד על כך.'
+                    }
+                ]
+            },
+            {
+                id: 3,
+                title: "תרחיש 3: דניאל השקט",
+                story: `דניאל, בן 7, תלמיד בכיתה ב'. המורה מבחינה שדניאל כל הזמן מתנדנד על הכיסא, מקליק עם העט, ומשחק עם הרוכסן של התיק. 
+                
+זה לא ממש מפריע לילדים האחרים, אבל דניאל עצמו לא מקשיב לשיעור. המורה שמה לב שזה קורה הכי הרבה בשיעורי בוקר, כשיש שקט בכיתה, או כשדניאל נראה עייף.
+                
+כשהמורה אומרת לו "דניאל, תפסיק לשחק עם העט", הוא עוצר לשנייה אבל אז מתחיל שוב. זה קורה גם כשהוא לבד, וגם כשיש ילדים סביבו.`,
+                questions: [
+                    {
+                        question: 'מהם האירועים המקדימים (A)?',
+                        options: [
+                            'המורה כועסת על דניאל',
+                            'שיעורי בוקר + שקט בכיתה + עייפות (נסיבות רקע + זמן לא מובנה)',
+                            'דניאל רעב',
+                            'יש מבחן'
+                        ],
+                        correct: 1,
+                        explanation: 'נכון! האירועים המקדימים כוללים נסיבות רקע (עייפות - גורם ביולוגי) + זמן לא מובנה (שקט, חוסר גירויים). אלה תנאים שבהם דניאל צריך גירוי חושי כדי להתארגן ולהתעורר.'
+                    },
+                    {
+                        question: 'מהי ההתנהגות (B)?',
+                        options: [
+                            'דניאל לא מרוכז',
+                            'דניאל מתנדנד על הכיסא, מקליק עט, משחק עם רוכסן',
+                            'דניאל מפריע',
+                            'דניאל משועמם'
+                        ],
+                        correct: 1,
+                        explanation: 'מעולה! התנהגות ספציפית ומדידה - נדנוד, קליקים, משחק עם רוכסן. לא "לא מרוכז" או "משועמם" - אלה פרשנויות, לא תיאור אובייקטיבי של ההתנהגות עצמה.'
+                    },
+                    {
+                        question: 'מהן התוצאות (C)?',
+                        options: [
+                            'המורה נוזפת בו',
+                            'הילדים צוחקים',
+                            'התנועות והצלילים מספקים לדניאל גירוי חושי (ויזואלי, שמיעתי, תנועתי) שעוזר לו',
+                            'דניאל מקבל מדבקה'
+                        ],
+                        correct: 2,
+                        explanation: 'נכון מאוד! התוצאה המחזקת היא חיזוק אוטומטי - הגירוי החושי עצמו (התנועה, הקול, התחושה). זה עוזר למוח של דניאל להתעורר, להתארגן ולהתמקד. זו לא תשומת לב ולא בריחה - זה צורך פיזיולוגי.'
+                    },
+                    {
+                        question: 'מהי הפונקציה?',
+                        options: [
+                            'השגת תשומת לב',
+                            'בריחה מהשיעור',
+                            'השגת צעצוע',
+                            'ויסות עצמי/גירוי חושי - להתעורר ולהתמקד (חיזוק אוטומטי)'
+                        ],
+                        correct: 3,
+                        explanation: 'מצוין! הפונקציה היא ויסות עצמי/חיזוק אוטומטי. הראיה: דניאל לא עושה את זה בשביל תשומת לב (זה קורה גם כשהוא לבד), והוא לא בורח ממשימה. הגוף שלו פשוט צריך תנועה וגירוי כדי להישאר ער וממוקד.'
+                    }
+                ]
+            }
+        ];
+
+        function App() {
+            const [currentSection, setCurrentSection] = useState('intro');
+            const [currentScenario, setCurrentScenario] = useState(0);
+            const [currentQuestion, setCurrentQuestion] = useState(0);
+            const [selectedAnswer, setSelectedAnswer] = useState(null);
+            const [showFeedback, setShowFeedback] = useState(false);
+            const [score, setScore] = useState(0);
+            const [answers, setAnswers] = useState([]);
+
+            const renderIntro = () => (
+                <div className="section">
+                    <h2 style={{textAlign: 'center', color: '#2c3e50', marginBottom: '30px'}}>
+                        ברוכים הבאים! 🎯
+                    </h2>
+                    
+                    <div className="key-question">
+                        מהם התנאים שבנוכחותם מתפתחת התנהגות?
+                    </div>
+
+                    <div className="info-box">
+                        <h4>כיצד ניתן לשנות את "סביבת המחיה" של ההתנהגות?</h4>
+                        <p style={{marginBottom: '15px'}}>שינוי <strong>נסיבות מקדימות</strong> ו<strong>תוצאות נלוות</strong> על מנת לסייע ב:</p>
+                        
+                        <ol className="numbered-list">
+                            <li>הגברת התנהגויות רצויות / מסתגלות / על פי חוקים ונורמות התנהגות מצופות</li>
+                            <li>הפחתת התנהגויות שאינן רצויות / אסורות / מסוכנות</li>
+                            <li>למידה של התנהגות חדשה או שכלול התנהגות קיימת</li>
+                        </ol>
+                    </div>
+
+                    <div className="abc-visual">
+                        <div className="abc-card">
+                            <div className="icon">🎯</div>
+                            <h3>A - אירועים מקדימים</h3>
+                            <p><strong>Antecedents</strong></p>
+                            <p>מה קרה <strong>לפני</strong>?</p>
+                        </div>
+
+                        <div className="abc-card">
+                            <div className="icon">👁️</div>
+                            <h3>B - התנהגות</h3>
+                            <p><strong>Behavior</strong></p>
+                            <p>מה הילד עשה <strong>בדיוק</strong>?</p>
+                        </div>
+
+                        <div className="abc-card">
+                            <div className="icon">⚡</div>
+                            <h3>C - תוצאות משמרות</h3>
+                            <p><strong>Consequences</strong></p>
+                            <p>מה קרה מיד <strong>אחרי</strong>?</p>
+                        </div>
+                    </div>
+
+                    <div style={{textAlign: 'center', marginTop: '40px'}}>
+                        <button className="button" onClick={() => setCurrentSection('antecedents')}>
+                            התחל ללמוד! 🚀
+                        </button>
+                    </div>
+                </div>
+            );
+
+            const renderAntecedents = () => (
+                <div className="section">
+                    <h2 style={{textAlign: 'center', color: '#2c3e50', marginBottom: '30px'}}>
+                        🎯 אירועים מקדימים (Antecedents)
+                    </h2>
+
+                    <div className="info-box">
+                        <h4>💭 מה זה אירועים מקדימים?</h4>
+                        <p>אירועים מקדימים הם כל מה שקורה <strong>לפני</strong> ההתנהגות ומעלה את הסבירות להופעתה.</p>
+                    </div>
+
+                    <Expandable title="1️⃣ נסיבות רקע (Setting Events)">
+                        <h4 style={{color: '#667eea', marginBottom: '10px'}}>ביולוגיה וגופניות:</h4>
+                        <ul>
+                            <li>עייפות</li>
+                            <li>כאב</li>
+                            <li>מחלה</li>
+                            <li>חסך חושי</li>
+                        </ul>
+                        
+                        <h4 style={{color: '#667eea', margin: '15px 0 10px 0'}}>חוויות תסכול:</h4>
+                        <ul>
+                            <li>אירוע לא נעים בבית</li>
+                            <li>חווית תסכול בדרך לבית הספר</li>
+                            <li>קושי אקדמי</li>
+                        </ul>
+                    </Expandable>
+
+                    <Expandable title="2️⃣ טריגרים (Triggers)">
+                        <h4 style={{color: '#667eea', marginBottom: '10px'}}>טריגר 1 - הפסקת תשומת לב:</h4>
+                        <ul>
+                            <li>המורה עוברת לעזור לתלמיד אחר</li>
+                            <li>המתנה ארוכה</li>
+                        </ul>
+                        
+                        <h4 style={{color: '#667eea', margin: '15px 0 10px 0'}}>טריגר 2 - הפסקת פעילות:</h4>
+                        <ul>
+                            <li>בקשה להפסיק פעילות מועדפת</li>
+                            <li>בקשה להמתין</li>
+                        </ul>
+                        
+                        <h4 style={{color: '#667eea', margin: '15px 0 10px 0'}}>טריגר 3 - סירוב:</h4>
+                        <ul>
+                            <li>אי מתן רשות</li>
+                            <li>מניעת גישה למחזק</li>
+                        </ul>
+                        
+                        <h4 style={{color: '#667eea', margin: '15px 0 10px 0'}}>טריגר 4 - מצבי דרישה:</h4>
+                        <ul>
+                            <li>מתן משימה אקדמית</li>
+                            <li>משימות קשות</li>
+                            <li>משימות ארוכות</li>
+                        </ul>
+                        
+                        <h4 style={{color: '#667eea', margin: '15px 0 10px 0'}}>טריגר 5 - מצבים אברסיביים:</h4>
+                        <ul>
+                            <li>הצקה</li>
+                            <li>דחייה חברתית</li>
+                            <li>נזיפה</li>
+                        </ul>
+                    </Expandable>
+
+                    <div style={{textAlign: 'center', marginTop: '40px'}}>
+                        <button className="button" onClick={() => setCurrentSection('consequences')}>
+                            המשך לתוצאות ⚡
+                        </button>
+                    </div>
+                </div>
+            );
+
+            const renderConsequences = () => (
+                <div className="section">
+                    <h2 style={{textAlign: 'center', color: '#2c3e50', marginBottom: '30px'}}>
+                        ⚡ תוצאות משמרות (Consequences)
+                    </h2>
+
+                    <div className="info-box">
+                        <h4>💭 מה זה תוצאות משמרות?</h4>
+                        <p>תוצאות הן כל מה שקורה <strong>מיד אחרי</strong> ההתנהגות ו<strong>מחזק</strong> אותה.</p>
+                        <p style={{marginTop: '10px', fontWeight: 'bold'}}>⚠️ חשוב: חיזוק חיובי ושלילי - שניהם מגבירים!</p>
+                    </div>
+
+                    <Expandable title="1️⃣ חיזוק חיובי - הוספת משהו נעים">
+                        <h4 style={{color: '#667eea', marginBottom: '10px'}}>תשומת לב:</h4>
+                        <ul>
+                            <li>הסבר או הרגעה</li>
+                            <li>נזיפה (גם זו תשומת לב!)</li>
+                            <li>צחוק של חברים</li>
+                        </ul>
+                        
+                        <h4 style={{color: '#667eea', margin: '15px 0 10px 0'}}>גישה לדבר רצוי:</h4>
+                        <ul>
+                            <li>קבלת פעילות מועדפת</li>
+                            <li>גישה לטאבלט/מחשב</li>
+                            <li>זמן חופשי</li>
+                        </ul>
+                    </Expandable>
+
+                    <Expandable title="2️⃣ חיזוק שלילי - הסרת משהו לא נעים">
+                        <h4 style={{color: '#667eea', marginBottom: '10px'}}>בריחה ממשימות:</h4>
+                        <ul>
+                            <li>הפחתת כמות ("תעשה רק חצי")</li>
+                            <li>הקלה בדרישה</li>
+                            <li>שחרור מהמשימה</li>
+                        </ul>
+                    </Expandable>
+
+                    <div style={{textAlign: 'center', marginTop: '40px'}}>
+                        <button className="button" onClick={() => setCurrentSection('functions')}>
+                            המשך ל-4 הפונקציות 🎯
+                        </button>
+                    </div>
+                </div>
+            );
+
+            const renderFunctions = () => (
+                <div className="section">
+                    <h2 style={{textAlign: 'center', color: '#2c3e50', marginBottom: '30px'}}>
+                        4 הפונקציות של התנהגות 🎯
+                    </h2>
+
+                    <div className="info-box">
+                        <h4>💭 מה זה פונקציה?</h4>
+                        <p><strong>פונקציה</strong> = המטרה שבגללה הילד מתנהג כך.</p>
+                    </div>
+
+                    <div className="function-card function-attention">
+                        <h3><span style={{fontSize: '30px', marginLeft: '10px'}}>🔍</span>1. תשומת לב</h3>
+                        <p>הילד רוצה שישימו לב אליו</p>
+                    </div>
+
+                    <div className="function-card function-escape">
+                        <h3><span style={{fontSize: '30px', marginLeft: '10px'}}>🚪</span>2. בריחה/הימנעות</h3>
+                        <p>הילד רוצה לברוח ממשהו לא נעים</p>
+                    </div>
+
+                    <div className="function-card function-access">
+                        <h3><span style={{fontSize: '30px', marginLeft: '10px'}}>🎁</span>3. השגת דבר רצוי</h3>
+                        <p>הילד רוצה לקבל משהו ספציפי</p>
+                    </div>
+
+                    <div className="function-card function-sensory">
+                        <h3><span style={{fontSize: '30px', marginLeft: '10px'}}>⚡</span>4. ויסות עצמי</h3>
+                        <p>הגוף צריך תנועה או גירוי</p>
+                    </div>
+
+                    <div style={{textAlign: 'center', marginTop: '40px'}}>
+                        <button className="button" onClick={() => setCurrentSection('practice')}>
+                            עכשיו בואו נתרגל! 💪
+                        </button>
+                    </div>
+                </div>
+            );
+
+            const renderPractice = () => {
+                const scenario = scenarios[currentScenario];
+                const question = scenario.questions[currentQuestion];
+                const totalQuestions = scenarios.reduce((sum, s) => sum + s.questions.length, 0);
+                const answeredQuestions = answers.length;
+                const progress = (answeredQuestions / totalQuestions) * 100;
+
+                return (
+                    <div className="section">
+                        <div className="progress-bar">
+                            <div className="progress-fill" style={{width: `${progress}%`}}>
+                                {Math.round(progress)}%
+                            </div>
+                        </div>
+
+                        <div className="scenario-card">
+                            <h3>{scenario.title}</h3>
+                            <div className="scenario-text">
+                                {scenario.story}
+                            </div>
+
+                            <div className="question-box">
+                                <h4>שאלה {currentQuestion + 1} מתוך {scenario.questions.length}: {question.question}</h4>
+                                <div className="options">
+                                    {question.options.map((option, index) => (
+                                        <div
+                                            key={index}
+                                            className={`option ${
+                                                selectedAnswer === index ? 'selected' : ''
+                                            } ${
+                                                showFeedback && index === question.correct ? 'correct' : ''
+                                            } ${
+                                                showFeedback && selectedAnswer === index && index !== question.correct ? 'wrong' : ''
+                                            }`}
+                                            onClick={() => !showFeedback && setSelectedAnswer(index)}
+                                        >
+                                            {option}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {showFeedback && (
+                                <div className={`feedback ${selectedAnswer === question.correct ? 'correct' : 'wrong'}`}>
+                                    <h4>{selectedAnswer === question.correct ? '✅ כל הכבוד!' : '❌ לא בדיוק...'}</h4>
+                                    <p>{question.explanation}</p>
+                                </div>
+                            )}
+
+                            <div style={{textAlign: 'center', marginTop: '20px'}}>
+                                {!showFeedback ? (
+                                    <button 
+                                        className="button" 
+                                        onClick={() => {
+                                            setShowFeedback(true);
+                                            if (selectedAnswer === question.correct) {
+                                                setScore(score + 1);
+                                            }
+                                            setAnswers([...answers, {
+                                                scenario: currentScenario,
+                                                question: currentQuestion,
+                                                correct: selectedAnswer === question.correct
+                                            }]);
+                                        }}
+                                        disabled={selectedAnswer === null}
+                                    >
+                                        בדוק תשובה ✓
+                                    </button>
+                                ) : (
+                                    <button 
+                                        className="button" 
+                                        onClick={() => {
+                                            if (currentQuestion < scenario.questions.length - 1) {
+                                                setCurrentQuestion(currentQuestion + 1);
+                                                setSelectedAnswer(null);
+                                                setShowFeedback(false);
+                                            } else if (currentScenario < scenarios.length - 1) {
+                                                setCurrentScenario(currentScenario + 1);
+                                                setCurrentQuestion(0);
+                                                setSelectedAnswer(null);
+                                                setShowFeedback(false);
+                                            } else {
+                                                setCurrentSection('results');
+                                            }
+                                        }}
+                                    >
+                                        {currentQuestion < scenario.questions.length - 1 ? 'שאלה הבאה →' : 
+                                         currentScenario < scenarios.length - 1 ? 'תרחיש הבא →' : 'סיימתי! 🎉'}
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                );
+            };
+
+            const renderResults = () => {
+                const totalQuestions = scenarios.reduce((sum, s) => sum + s.questions.length, 0);
+                const percentage = Math.round((score / totalQuestions) * 100);
+                const passed = percentage >= 75;
+
+                return (
+                    <div className="section">
+                        <div className="score-card">
+                            <h2>🎉 סיימת!</h2>
+                            <div style={{fontSize: '80px'}}>🏆</div>
+                            <h2>{score} / {totalQuestions}</h2>
+                            <p style={{fontSize: '24px'}}>ציון: {percentage}%</p>
+                            {passed && <p style={{fontSize: '24px'}}>✅ כל הכבוד!</p>}
+                        </div>
+
+                        {passed && (
+                            <div className="certificate">
+                                <h2>תעודת הסמכה</h2>
+                                <div className="seal">🎖️</div>
+                                <p style={{fontSize: '20px', color: '#2c3e50'}}>
+                                    מעידים בזאת כי המטפלת הרגשית
+                                </p>
+                                <p style={{fontSize: '28px', color: '#667eea', fontWeight: 'bold', margin: '20px 0'}}>
+                                    _____________________
+                                </p>
+                                <p style={{fontSize: '20px', color: '#2c3e50'}}>
+                                    השלימה בהצלחה את האפליקציה<br/>
+                                    לניתוח התנהגות תפקודי
+                                </p>
+                                <p style={{fontSize: '16px', color: '#666', marginTop: '30px'}}>
+                                    תאריך: {new Date().toLocaleDateString('he-IL')}
+                                </p>
+                            </div>
+                        )}
+
+                        <div style={{textAlign: 'center', marginTop: '30px'}}>
+                            <button className="button" onClick={() => {
+                                setCurrentSection('intro');
+                                setCurrentScenario(0);
+                                setCurrentQuestion(0);
+                                setScore(0);
+                                setAnswers([]);
+                                setSelectedAnswer(null);
+                                setShowFeedback(false);
+                            }}>
+                                התחל מחדש 🔄
+                            </button>
+                        </div>
+                    </div>
+                );
+            };
+
+            return (
+                <div className="app-container">
+                    <div className="header">
+                        <h1>🎯 ניתוח התנהגות תפקודי</h1>
+                        <p>למטפלות רגשיות ואנשי צוות חינוכי</p>
+                    </div>
+
+                    <div className="content">
+                        <div className="nav-buttons">
+                            <button 
+                                className={`nav-button ${currentSection === 'intro' ? 'active' : ''}`}
+                                onClick={() => setCurrentSection('intro')}
+                            >
+                                🏠 התחלה
+                            </button>
+                            <button 
+                                className={`nav-button ${currentSection === 'antecedents' ? 'active' : ''}`}
+                                onClick={() => setCurrentSection('antecedents')}
+                            >
+                                🎯 אירועים מקדימים
+                            </button>
+                            <button 
+                                className={`nav-button ${currentSection === 'consequences' ? 'active' : ''}`}
+                                onClick={() => setCurrentSection('consequences')}
+                            >
+                                ⚡ תוצאות
+                            </button>
+                            <button 
+                                className={`nav-button ${currentSection === 'functions' ? 'active' : ''}`}
+                                onClick={() => setCurrentSection('functions')}
+                            >
+                                📚 4 הפונקציות
+                            </button>
+                            <button 
+                                className={`nav-button ${currentSection === 'practice' ? 'active' : ''}`}
+                                onClick={() => setCurrentSection('practice')}
+                            >
+                                💪 תרגול
+                            </button>
+                            {answers.length > 0 && (
+                                <button 
+                                    className={`nav-button ${currentSection === 'results' ? 'active' : ''}`}
+                                    onClick={() => setCurrentSection('results')}
+                                >
+                                    🏆 תוצאות
+                                </button>
+                            )}
+                        </div>
+
+                        {currentSection === 'intro' && renderIntro()}
+                        {currentSection === 'antecedents' && renderAntecedents()}
+                        {currentSection === 'consequences' && renderConsequences()}
+                        {currentSection === 'functions' && renderFunctions()}
+                        {currentSection === 'practice' && renderPractice()}
+                        {currentSection === 'results' && renderResults()}
+                    </div>
+                </div>
+            );
+        }
+
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+</body>
+</html>
