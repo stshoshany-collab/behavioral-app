@@ -1,0 +1,466 @@
+בנה אפליקציית אינטרנט בעברית מלאה, מימין לשמאל, בשם "תיעוד אירועי אלימות שבועי".
+האפליקציה מיועדת למנתחות התנהגות שממלאות אותה בנייד בזמן אמת במהלך יום הלימודים. הנייד הוא המסך העיקרי.
+מצורף למטה קוד HTML של גרסה קיימת. השתמש בו כדוגמה מדויקת לעיצוב, למבנה ולהתנהגות, אבל החלף את מנגנון השמירה שלו במסד נתונים בענן ובכניסה עם מייל, כמתואר כאן.
+
+כניסה ושמירת נתונים לפי מייל
+- כל משתמשת נרשמת ונכנסת עם כתובת המייל שלה (קישור כניסה למייל או מייל וסיסמה).
+- כל הנתונים שהיא רושמת נשמרים במסד נתונים בענן תחת החשבון שלה ומסונכרנים בין כל המכשירים שבהם היא מחוברת.
+- כל משתמשת רואה רק את הנתונים שלה. משתמשת אחרת לא רואה אותם.
+- כפתור "שליחת הסיכום למייל שלי" ששולח את הסיכום השבועי (טקסט מסודר וקובץ CSV מצורף) לכתובת המייל של המשתמשת המחוברת.
+- שמירה אוטומטית אחרי כל הקשה, עם חיווי "נשמר". בלי קליטה — לשמור במכשיר ולסנכרן כשהחיבור חוזר.
+
+תיקים
+- משתמשת יכולה לפתוח כמה תיקים (תלמיד/ה או מסגרת). לכל תיק אותו מבנה שבועי.
+- בשם התיק לרשום כינוי או ראשי תיבות בלבד, לא שם מלא של תלמיד.
+
+מבנה הנתונים
+- שבוע מתחיל ביום ראשון. השבוע הראשון: 18.10.2026.
+- ימים: ראשון, שני, שלישי, רביעי, חמישי, שישי.
+- עשר משבצות ביום:
+  8:00 שיעור 1 · 8:50 שיעור 2 · 9:40 אוכל · 9:50 הפסקה · 10:05 שיעור 3 · 10:55 שיעור 4 · 11:40 הפסקה · 11:55 שיעור 5 · 12:35 שיעור 6 · 13:20 שיעור 7 (עד 14:05)
+- שלוש התנהגויות לכל משבצת: 1. מכות בידיים · 2. בעיטות · 3. דחיפות
+- לכל משבצת: מונה לכל התנהגות והערה חופשית.
+- כל שבוע נשמר בנפרד ואינו דורס שבוע אחר.
+
+מסך ראשי
+- כותרת: "תיעוד אירועי אלימות שבועי". שורת משנה: "דף איסוף נתונים · התנהגות: אלימות".
+- בחירת תיק, מקרא צבעוני של שלוש ההתנהגויות, ושורת מעבר בין שבועות (קודם / הבא) עם טווח התאריכים.
+- שורת שישה ימים עם תאריך ומספר האירועים בכל יום. בשבוע הנוכחי האפליקציה נפתחת על היום של היום.
+- רשימת עשר המשבצות. בכל משבצת: שעה ושם, ושלושה כפתורי הקשה גדולים (מכות / בעיטות / דחיפות) שמציגים את המספר. המשבצת של השעה הנוכחית מודגשת.
+- כפתור "הערה" בכל משבצת שפותח תיבת טקסט.
+- סרגל קבוע בתחתית המסך: "ביטול פעולה אחרונה", "מצב הפחתה" (כל הקשה מפחיתה אחד, לא מתחת לאפס) וסיכום היום.
+
+סיכום שבועי
+- ארבע קוביות: סה״כ, מכות, בעיטות, דחיפות.
+- טבלה: משבצות מול ימים, עם סה״כ לשורה ולעמודה והצללה לפי כמות האירועים.
+- "העתקת הסיכום" — טקסט מסודר להדבקה בוואטסאפ.
+- "הורדת קובץ לגיליון" — CSV עם העמודות: תאריך, יום, שעה, משבצת, מכות בידיים, בעיטות, דחיפות, סה״כ, הערה (עם BOM כדי שאקסל יציג עברית).
+- "שליחת הסיכום למייל שלי".
+
+עיצוב
+- כמו בקוד המצורף: נקי ומקצועי, מותאם לנייד, כפתורים גדולים.
+- צבעים: כחול כהה לכותרות, אדום-לבנה למכות, חרדל לבעיטות, טורקיז כהה לדחיפות. תמיכה במצב כהה.
+- גופנים: Rubik לכותרות ומספרים, Assistant לטקסט.
+- כל הטקסטים בממשק בעברית בלבד.
+
+הקוד הקיים:
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<!-- תיעוד אירועי אלימות שבועי · קוד האפליקציה · גרסה 3 · 14.10.2026
+     כתובת חיה (עם שמירה בענן): https://claude.ai/artifact/UCW2afR4wpTmLLWkvjYkMP
+     פתיחה מקומית של הקובץ הזה עובדת עם שמירה בדפדפן בלבד. -->
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font-family:system-ui,sans-serif;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>תיעוד אירועי אלימות שבועי</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700&family=Rubik:wght@500;700&display=swap">
+<style>
+/* פריסה: כרטיס יום אחד בכל פעם, שורה לכל משבצת במערכת, שלושה מוני הקשה גדולים; סיכום שבועי כטבלת חום מתחת */
+:root{
+  --bg:#f3f4f1; --surface:#ffffff; --ink:#1d2430; --muted:#5f6876; --line:#d9dcd6;
+  --accent:#28456b; --accent-soft:#e3e9f2;
+  --hit:#b23a2e; --hit-soft:#f6e1de;
+  --kick:#a36a00; --kick-soft:#f7ebd2;
+  --push:#1f6f6a; --push-soft:#d9eeec;
+  --heat:40,69,107;
+  --f-head:"Rubik","Assistant",system-ui,sans-serif;
+  --f-body:"Assistant",system-ui,"Segoe UI",Arial,sans-serif;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#14181e; --surface:#1d232b; --ink:#e8ebef; --muted:#9aa3ae; --line:#323a45;
+  --accent:#9db8de; --accent-soft:#26313f;
+  --hit:#f08a7d; --hit-soft:#3a2523; --kick:#e7b45a; --kick-soft:#3a2f1b; --push:#6fcfc6; --push-soft:#1b3533;
+  --heat:157,184,222; color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#14181e; --surface:#1d232b; --ink:#e8ebef; --muted:#9aa3ae; --line:#323a45;
+  --accent:#9db8de; --accent-soft:#26313f;
+  --hit:#f08a7d; --hit-soft:#3a2523; --kick:#e7b45a; --kick-soft:#3a2f1b; --push:#6fcfc6; --push-soft:#1b3533;
+  --heat:157,184,222; color-scheme:dark }
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.5}
+.wrap{max-width:760px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:18px 110px;display:flex;flex-direction:column;gap:18px}
+h1,h2{font-family:var(--f-head);margin:0;text-wrap:balance}
+h1{font-size:1.45rem;color:var(--accent)}
+h2{font-size:1.1rem}
+.sub{color:var(--muted);font-size:.95rem;margin:2px 0 0}
+.status{font-size:.85rem;color:var(--muted);display:flex;align-items:center;gap:6px}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--muted)}
+.dot.ok{background:var(--push)} .dot.warn{background:var(--kick)}
+.legend{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-weight:700;font-size:.9rem;padding:3px 10px;border-radius:999px}
+.c-h{background:var(--hit-soft);color:var(--hit)} .c-k{background:var(--kick-soft);color:var(--kick)} .c-p{background:var(--push-soft);color:var(--push)}
+.weekbar{display:flex;align-items:center;justify-content:space-between;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:8px}
+.weekbar strong{font-family:var(--f-head);font-variant-numeric:tabular-nums;text-align:center;flex:1}
+button{font:inherit;color:inherit;cursor:pointer}
+.nav{background:var(--accent-soft);color:var(--accent);border:0;border-radius:8px;padding:8px 12px;font-weight:700}
+.nav:focus-visible,button:focus-visible,textarea:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.days{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
+.day{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:6px 2px;display:flex;flex-direction:column;align-items:center;line-height:1.2}
+.day b{font-family:var(--f-head);font-size:.95rem}
+.day small{color:var(--muted);font-variant-numeric:tabular-nums}
+.day .n{font-size:.75rem;color:var(--muted)}
+.day[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--surface)}
+.day[aria-pressed="true"] small,.day[aria-pressed="true"] .n{color:var(--surface);opacity:.85}
+.label-row{display:flex;gap:8px;align-items:center}
+.label-row label{color:var(--muted);font-size:.9rem;white-space:nowrap}
+.label-row input{flex:1;min-width:0;font:inherit;padding:7px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink)}
+.slots{display:flex;flex-direction:column;gap:8px}
+.slot{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px;display:grid;grid-template-columns:78px 1fr;gap:10px;align-items:center}
+.slot.now{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}
+.slot.break .when b{color:var(--muted)}
+.when{display:flex;flex-direction:column;line-height:1.2}
+.when span{font-variant-numeric:tabular-nums;color:var(--muted);font-size:.9rem}
+.when b{font-family:var(--f-head);font-size:1rem}
+.when button{margin-top:6px;background:none;border:0;padding:0;color:var(--accent);font-size:.85rem;text-align:start;text-decoration:underline}
+.counters{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.ctr{border:0;border-radius:10px;padding:8px 4px;display:flex;flex-direction:column;align-items:center;gap:0;min-height:62px;transition:transform .08s}
+.ctr:active{transform:scale(.96)}
+.ctr span{font-size:.8rem;font-weight:700}
+.ctr strong{font-family:var(--f-head);font-size:1.5rem;font-variant-numeric:tabular-nums;line-height:1.1}
+.ctr.zero strong{opacity:.35}
+.ctr.h{background:var(--hit-soft);color:var(--hit)} .ctr.k{background:var(--kick-soft);color:var(--kick)} .ctr.p{background:var(--push-soft);color:var(--push)}
+.ctr.minus{outline:2px dashed currentColor;outline-offset:-4px}
+.detail{grid-column:1/-1;border-top:1px dashed var(--line);padding-top:8px;display:flex;flex-direction:column;gap:8px}
+.detail textarea{font:inherit;width:100%;box-sizing:border-box;min-height:60px;padding:8px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);resize:vertical}
+.note-preview{grid-column:1/-1;font-size:.88rem;color:var(--muted);margin:0}
+.dock{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--line);padding-bottom:calc(10px + env(safe-area-inset-bottom,0px));padding-top:10px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));z-index:5}
+.dock-in{max-width:760px;margin:0 auto;display:flex;gap:8px;align-items:center}
+.dock button{border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:10px 12px;font-weight:700}
+.dock button[aria-pressed="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.dock .tot{margin-inline-start:auto;font-variant-numeric:tabular-nums;color:var(--muted);font-size:.9rem;text-align:end}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:12px}
+.tbl-wrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums;font-size:.9rem;min-width:520px}
+th,td{border:1px solid var(--line);padding:6px 4px;text-align:center}
+th{font-family:var(--f-head);font-weight:500;background:var(--bg)}
+td.rowh{text-align:start;white-space:nowrap;background:var(--bg)}
+td.rowh small{color:var(--muted);display:block}
+td.cell{font-weight:700}
+tfoot td{font-weight:700;background:var(--bg)}
+.totals{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.tot-box{border-radius:10px;padding:8px;text-align:center}
+.tot-box b{display:block;font-family:var(--f-head);font-size:1.6rem;font-variant-numeric:tabular-nums}
+.tot-box span{font-size:.85rem;font-weight:700}
+.tot-all{background:var(--accent-soft);color:var(--accent)}
+.actions{display:flex;flex-wrap:wrap;gap:8px}
+.actions button{border:1px solid var(--accent);background:none;color:var(--accent);border-radius:8px;padding:8px 12px;font-weight:700}
+.msg{font-size:.88rem;color:var(--muted);min-height:1.2em;margin:0}
+.empty{color:var(--muted);font-size:.9rem;margin:0}
+@media (max-width:420px){ .slot{grid-template-columns:64px 1fr} .ctr strong{font-size:1.3rem} .totals{grid-template-columns:repeat(2,1fr)} }
+@media (prefers-reduced-motion: reduce){ .ctr{transition:none} }
+</style>
+
+<div class="wrap" dir="rtl" lang="he">
+  <header>
+    <h1>תיעוד אירועי אלימות שבועי</h1>
+    <p class="sub">דף איסוף נתונים · התנהגות: אלימות · החל מ־18 לחודש</p>
+  </header>
+
+  <div class="legend" aria-label="התנהגויות">
+    <span class="chip c-h">1. מכות בידיים</span>
+    <span class="chip c-k">2. בעיטות</span>
+    <span class="chip c-p">3. דחיפות</span>
+  </div>
+
+  <div class="status" id="status"><span class="dot" id="dot"></span><span id="statusText">מתחבר לשמירה בענן…</span></div>
+
+  <div class="label-row">
+    <label for="who">תלמיד/ה או מסגרת:</label>
+    <input id="who" type="text" placeholder="אופציונלי — יישמר לשבוע הזה">
+  </div>
+
+  <div class="weekbar">
+    <button class="nav" id="prevW" aria-label="שבוע קודם">→ קודם</button>
+    <strong id="weekTitle">שבוע</strong>
+    <button class="nav" id="nextW" aria-label="שבוע הבא">הבא ←</button>
+  </div>
+
+  <div class="days" id="days" role="group" aria-label="בחירת יום"></div>
+
+  <section class="slots" id="slots" aria-label="משבצות היום"></section>
+
+  <section class="panel" aria-labelledby="sumh">
+    <h2 id="sumh">סיכום שבועי</h2>
+    <div class="totals" id="totals"></div>
+    <div class="tbl-wrap"><table id="grid"></table></div>
+    <div class="actions">
+      <button id="copyBtn">העתקת הסיכום</button>
+      <button id="csvBtn" hidden>הורדת קובץ לגיליון</button>
+    </div>
+    <p class="msg" id="msg"></p>
+  </section>
+</div>
+
+<div class="dock" dir="rtl">
+  <div class="dock-in">
+    <button id="undoBtn" disabled>ביטול פעולה אחרונה</button>
+    <button id="minusBtn" aria-pressed="false">מצב הפחתה</button>
+    <div class="tot" id="dayTot"></div>
+  </div>
+</div>
+
+<script>
+(function(){
+  document.documentElement.setAttribute('dir','rtl');
+  document.documentElement.setAttribute('lang','he');
+
+  const SLOTS=[
+    {id:'s1',t:'8:00',n:'שיעור 1',s:'8:00',e:'8:50'},
+    {id:'s2',t:'8:50',n:'שיעור 2',s:'8:50',e:'9:40'},
+    {id:'s3',t:'9:40',n:'אוכל',s:'9:40',e:'9:50',br:1},
+    {id:'s4',t:'9:50',n:'הפסקה',s:'9:50',e:'10:05',br:1},
+    {id:'s5',t:'10:05',n:'שיעור 3',s:'10:05',e:'10:55'},
+    {id:'s6',t:'10:55',n:'שיעור 4',s:'10:55',e:'11:40'},
+    {id:'s7',t:'11:40',n:'הפסקה',s:'11:40',e:'11:55',br:1},
+    {id:'s8',t:'11:55',n:'שיעור 5',s:'11:55',e:'12:35'},
+    {id:'s9',t:'12:35',n:'שיעור 6',s:'12:35',e:'13:20'},
+    {id:'s10',t:'13:20',n:'שיעור 7',s:'13:20',e:'14:05'}
+  ];
+  const DAYS=['ראשון','שני','שלישי','רביעי','חמישי','שישי'];
+  const B=[{k:'h',n:'מכות בידיים',short:'מכות'},{k:'k',n:'בעיטות',short:'בעיטות'},{k:'p',n:'דחיפות',short:'דחיפות'}];
+  const START=new Date(2026,9,18);
+
+  const $=id=>document.getElementById(id);
+  const pad=n=>String(n).padStart(2,'0');
+  const iso=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+  const addDays=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x};
+  const sundayOf=d=>{const x=new Date(d.getFullYear(),d.getMonth(),d.getDate());x.setDate(x.getDate()-x.getDay());return x};
+  const fmt=d=>d.getDate()+'.'+(d.getMonth()+1);
+  const mins=s=>{const [h,m]=s.split(':').map(Number);return h*60+m};
+
+  const today=new Date();
+  let week=sundayOf(today); if(week<START) week=new Date(START);
+  let dayIdx=(sundayOf(today).getTime()===week.getTime() && today.getDay()<6)?today.getDay():0;
+
+  let state={label:'',cells:{}};
+  let db=null, unsub=null, mode='local', minus=false, undo=[], openSlot=null;
+  let saveTimer=null, saving=false, dirty=false, lastLocalEdit=0;
+
+  function cell(d,s){const k='d'+d+s;return state.cells[k]||{h:0,k:0,p:0,n:''}}
+  function setCell(d,s,c){state.cells['d'+d+s]=c}
+  const sum=c=>(c.h||0)+(c.k||0)+(c.p||0);
+
+  function setStatus(kind,text){$('dot').className='dot '+kind;$('statusText').textContent=text}
+
+  /* ---------- שמירה ---------- */
+  const lsKey=()=>'daf-isuf-'+iso(week);
+  function loadLocal(){try{const v=localStorage.getItem(lsKey());return v?JSON.parse(v):null}catch(e){return null}}
+  function saveLocal(){try{localStorage.setItem(lsKey(),JSON.stringify(state))}catch(e){}}
+
+  function scheduleSave(){
+    lastLocalEdit=Date.now(); dirty=true; saveLocal();
+    clearTimeout(saveTimer); saveTimer=setTimeout(flush,700);
+    if(mode==='cloud') setStatus('warn','שומר…');
+  }
+  async function flush(){
+    if(mode!=='cloud'||!db||saving||!dirty) return;
+    saving=true; dirty=false;
+    try{
+      await db.doc('weeks/'+iso(week)).set({label:state.label||'',cells:state.cells,week:iso(week),updatedAt:new Date().toISOString()});
+      setStatus('ok','נשמר בענן · מסונכרן בין מכשירים');
+    }catch(e){
+      if(e&&e.code==='unavailable'){dirty=true;setTimeout(flush,1500+Math.random()*1000)}
+      else if(e&&e.code==='invalid_argument'){setStatus('warn','אין הרשאת כתיבה בענן — הנתונים נשמרים במכשיר הזה בלבד');mode='local'}
+      else{dirty=true;setStatus('warn','השמירה בענן נכשלה — הנתונים שמורים במכשיר, ננסה שוב')}
+    }finally{saving=false; if(dirty) flush()}
+  }
+
+  function subscribe(){
+    if(unsub){unsub();unsub=null}
+    const local=loadLocal();
+    state=local||{label:'',cells:{}};
+    render();
+    if(!db) return;
+    unsub=db.doc('weeks/'+iso(week)).onSnapshot(snap=>{
+      if(snap.metadata.hasPendingWrites) return;
+      if(dirty||saving||Date.now()-lastLocalEdit<1500) return;
+      if(snap.exists){
+        const d=snap.data();
+        state={label:d.label||'',cells:JSON.parse(JSON.stringify(d.cells||{}))};
+        saveLocal();
+      }else if(local && Object.keys(local.cells||{}).length){
+        dirty=true; flush();
+      }
+      setStatus('ok','נשמר בענן · מסונכרן בין מכשירים');
+      render();
+    },err=>{
+      mode='local'; setStatus('warn','החיבור לענן נותק — הנתונים נשמרים במכשיר הזה');
+    });
+  }
+
+  /* ---------- תצוגה ---------- */
+  function renderDays(){
+    const el=$('days'); el.innerHTML='';
+    DAYS.forEach((name,i)=>{
+      const d=addDays(week,i);
+      let t=0; SLOTS.forEach(s=>t+=sum(cell(i,s.id)));
+      const b=document.createElement('button');
+      b.className='day'; b.setAttribute('aria-pressed',i===dayIdx?'true':'false');
+      b.innerHTML='<b></b><small></small><span class="n"></span>';
+      b.children[0].textContent=name; b.children[1].textContent=fmt(d);
+      b.children[2].textContent=t?t+' אירועים':'—';
+      b.onclick=()=>{dayIdx=i;openSlot=null;render()};
+      el.appendChild(b);
+    });
+  }
+
+  function isNow(s){
+    const d=addDays(week,dayIdx); if(iso(d)!==iso(new Date())) return false;
+    const n=new Date(); const m=n.getHours()*60+n.getMinutes();
+    return m>=mins(s.s)&&m<mins(s.e);
+  }
+
+  function renderSlots(){
+    const el=$('slots'); el.innerHTML='';
+    SLOTS.forEach(s=>{
+      const c=cell(dayIdx,s.id);
+      const row=document.createElement('div');
+      row.className='slot'+(s.br?' break':'')+(isNow(s)?' now':'');
+      const when=document.createElement('div'); when.className='when';
+      when.innerHTML='<span></span><b></b><button type="button"></button>';
+      when.children[0].textContent=s.t; when.children[1].textContent=s.n;
+      when.children[2].textContent=openSlot===s.id?'סגירה':(c.n?'הערה ✎':'הערה');
+      when.children[2].onclick=()=>{openSlot=openSlot===s.id?null:s.id;renderSlots()};
+      row.appendChild(when);
+      const ctrs=document.createElement('div'); ctrs.className='counters';
+      B.forEach(b=>{
+        const v=c[b.k]||0;
+        const btn=document.createElement('button');
+        btn.type='button';
+        btn.className='ctr '+b.k+(v?'':' zero')+(minus?' minus':'');
+        btn.setAttribute('aria-label',b.n+' ב'+s.n+': '+v+(minus?' — הקשה תפחית':' — הקשה תוסיף'));
+        btn.innerHTML='<span></span><strong></strong>';
+        btn.children[0].textContent=b.short; btn.children[1].textContent=v;
+        btn.onclick=()=>bump(dayIdx,s.id,b.k,minus?-1:1);
+        ctrs.appendChild(btn);
+      });
+      row.appendChild(ctrs);
+      if(openSlot===s.id){
+        const det=document.createElement('div'); det.className='detail';
+        const ta=document.createElement('textarea');
+        ta.id='note-'+s.id; ta.placeholder='הערה: מה קרה לפני, כלפי מי, מה קרה אחרי…';
+        ta.value=c.n||'';
+        ta.oninput=()=>{const cc=Object.assign({},cell(dayIdx,s.id));cc.n=ta.value;setCell(dayIdx,s.id,cc);scheduleSave()};
+        det.appendChild(ta); row.appendChild(det);
+        setTimeout(()=>{ta.focus();const L=ta.value.length;try{ta.setSelectionRange(L,L)}catch(e){}},0);
+      }else if(c.n){
+        const p=document.createElement('p'); p.className='note-preview'; p.textContent='הערה: '+c.n; row.appendChild(p);
+      }
+      el.appendChild(row);
+    });
+    let t={h:0,k:0,p:0}; SLOTS.forEach(s=>{const c=cell(dayIdx,s.id);B.forEach(b=>t[b.k]+=c[b.k]||0)});
+    $('dayTot').textContent='יום '+DAYS[dayIdx]+': '+(t.h+t.k+t.p)+' (מכות '+t.h+' · בעיטות '+t.k+' · דחיפות '+t.p+')';
+  }
+
+  function renderSummary(){
+    const T={h:0,k:0,p:0};
+    let maxCell=0;
+    SLOTS.forEach(s=>DAYS.forEach((_,i)=>{const c=cell(i,s.id);B.forEach(b=>T[b.k]+=c[b.k]||0);maxCell=Math.max(maxCell,sum(c))}));
+    $('totals').innerHTML='';
+    [[ 'tot-all','סה״כ',T.h+T.k+T.p ],['c-h','מכות',T.h],['c-k','בעיטות',T.k],['c-p','דחיפות',T.p]].forEach(([cls,l,v])=>{
+      const d=document.createElement('div'); d.className='tot-box '+cls; d.innerHTML='<b></b><span></span>';
+      d.children[0].textContent=v; d.children[1].textContent=l; $('totals').appendChild(d);
+    });
+    const tbl=$('grid');
+    let h='<thead><tr><th>משבצת</th>'+DAYS.map((d,i)=>'<th>'+d+'<br><small>'+fmt(addDays(week,i))+'</small></th>').join('')+'<th>סה״כ</th></tr></thead><tbody>';
+    const colT=[0,0,0,0,0,0];
+    SLOTS.forEach(s=>{
+      let rowT=0;
+      h+='<tr><td class="rowh">'+s.n+'<small>'+s.t+'</small></td>';
+      DAYS.forEach((_,i)=>{
+        const c=cell(i,s.id), v=sum(c); rowT+=v; colT[i]+=v;
+        const a=maxCell?(v/maxCell)*0.55:0;
+        const title=v?('מכות '+(c.h||0)+' · בעיטות '+(c.k||0)+' · דחיפות '+(c.p||0)):'';
+        h+='<td class="cell" title="'+title+'" style="background:rgba(var(--heat),'+a.toFixed(2)+')">'+(v||'')+'</td>';
+      });
+      h+='<td><b>'+rowT+'</b></td></tr>';
+    });
+    h+='</tbody><tfoot><tr><td class="rowh">סה״כ</td>'+colT.map(v=>'<td>'+v+'</td>').join('')+'<td>'+colT.reduce((a,b)=>a+b,0)+'</td></tr></tfoot>';
+    tbl.innerHTML=h;
+  }
+
+  function render(){
+    const end=addDays(week,5);
+    $('weekTitle').textContent='שבוע '+fmt(week)+' – '+fmt(end)+'.'+end.getFullYear();
+    const who=$('who'); if(document.activeElement!==who) who.value=state.label||'';
+    renderDays(); renderSlots(); renderSummary();
+    $('undoBtn').disabled=!undo.length;
+  }
+
+  /* ---------- פעולות ---------- */
+  function bump(d,s,k,delta){
+    const c=Object.assign({h:0,k:0,p:0,n:''},cell(d,s));
+    const nv=Math.max(0,(c[k]||0)+delta);
+    if(nv===(c[k]||0)) return;
+    undo.push({week:iso(week),d,s,k,prev:c[k]||0});
+    if(undo.length>50) undo.shift();
+    c[k]=nv; setCell(d,s,c); scheduleSave(); render();
+    if(navigator.vibrate){try{navigator.vibrate(15)}catch(e){}}
+  }
+  $('undoBtn').onclick=()=>{
+    const u=undo.pop(); if(!u) return;
+    if(u.week!==iso(week)){render();return}
+    const c=Object.assign({h:0,k:0,p:0,n:''},cell(u.d,u.s)); c[u.k]=u.prev; setCell(u.d,u.s,c); scheduleSave(); render();
+  };
+  $('minusBtn').onclick=()=>{minus=!minus;$('minusBtn').setAttribute('aria-pressed',minus);renderSlots()};
+  $('prevW').onclick=()=>{flush();week=addDays(week,-7);dayIdx=0;undo=[];openSlot=null;subscribe()};
+  $('nextW').onclick=()=>{flush();week=addDays(week,7);dayIdx=0;undo=[];openSlot=null;subscribe()};
+  $('who').oninput=e=>{state.label=e.target.value;scheduleSave()};
+
+  function summaryText(){
+    let t='תיעוד אירועי אלימות שבועי\n'+(state.label?state.label+'\n':'')+$('weekTitle').textContent+'\n\n';
+    DAYS.forEach((dn,i)=>{
+      const lines=[];
+      SLOTS.forEach(s=>{const c=cell(i,s.id);if(sum(c)||c.n){lines.push('  '+s.t+' '+s.n+': מכות '+(c.h||0)+', בעיטות '+(c.k||0)+', דחיפות '+(c.p||0)+(c.n?' — '+c.n:''))}});
+      t+=dn+' '+fmt(addDays(week,i))+(lines.length?'\n'+lines.join('\n'):': אין אירועים')+'\n';
+    });
+    const T={h:0,k:0,p:0}; SLOTS.forEach(s=>DAYS.forEach((_,i)=>{const c=cell(i,s.id);B.forEach(b=>T[b.k]+=c[b.k]||0)}));
+    t+='\nסה״כ לשבוע: '+(T.h+T.k+T.p)+' (מכות '+T.h+', בעיטות '+T.k+', דחיפות '+T.p+')';
+    return t;
+  }
+  $('copyBtn').onclick=async()=>{
+    const txt=summaryText();
+    try{await navigator.clipboard.writeText(txt);$('msg').textContent='הסיכום הועתק. אפשר להדביק בוואטסאפ או במסמך.'}
+    catch(e){
+      const ta=document.createElement('textarea');ta.value=txt;ta.style.width='100%';ta.rows=8;$('msg').textContent='ההעתקה האוטומטית לא זמינה כאן — סמני את הטקסט והעתיקי:';$('msg').after(ta);ta.select();
+    }
+  };
+  function csv(){
+    const q=v=>'"'+String(v).replace(/"/g,'""')+'"';
+    const rows=[['תאריך','יום','שעה','משבצת','מכות בידיים','בעיטות','דחיפות','סה״כ','הערה']];
+    DAYS.forEach((dn,i)=>SLOTS.forEach(s=>{const c=cell(i,s.id);rows.push([iso(addDays(week,i)),dn,s.t,s.n,c.h||0,c.k||0,c.p||0,sum(c),c.n||''])}));
+    return '﻿'+rows.map(r=>r.map(q).join(',')).join('\r\n');
+  }
+
+  /* ---------- אתחול ---------- */
+  subscribe();
+  setStatus('','שמירה במכשיר — בודק חיבור לענן…');
+  (async()=>{
+    try{
+      for(let i=0;i<30&&!(window.claude&&window.claude.use);i++) await new Promise(r=>setTimeout(r,100));
+      if(window.claude&&window.claude.use){
+        db=await window.claude.use('db');
+        const dl=await window.claude.use('downloads');
+        if(dl){
+          $('csvBtn').hidden=false;
+          $('csvBtn').onclick=async()=>{
+            try{await dl.save({filename:'איסוף-נתונים-'+iso(week)+'.csv',data:csv()});$('msg').textContent='הקובץ נשמר.'}
+            catch(e){$('msg').textContent='הקובץ לא נשמר.'}
+          };
+        }
+      }
+    }catch(e){db=null}
+    if(db){mode='cloud';setStatus('warn','מתחבר לענן…');subscribe()}
+    else setStatus('warn','הנתונים נשמרים במכשיר הזה בלבד (אין חיבור לענן בתצוגה זו)');
+  })();
+  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')flush()});
+  setInterval(()=>{if(document.visibilityState==='visible'&&!openSlot)renderSlots()},60000);
+})();
+</script>
+
+</body>
+</html>
